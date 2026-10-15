@@ -1,15 +1,19 @@
-# Use the ubuntu
 FROM python:3.10-slim
 
-# Set the working directory to /app
 WORKDIR /app
 
-COPY sample-stocks/ ./sample-stocks/
-
 COPY requirements.txt requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt gunicorn
 
-RUN pip install -r requirements.txt 
+# Unzip the sample data (the repo only has the .zip)
+COPY sample-stocks.zip ./
+RUN python -c "import zipfile; zipfile.ZipFile('sample-stocks.zip').extractall('.')" \
+    && rm sample-stocks.zip
 
-COPY ["app.py", "utils.py",  "./"] 
+COPY ["app.py", "utils.py", "./"]
 
-CMD ["python3", "app.py"]
+ENV PORT=5001
+EXPOSE 5001
+
+# 1 worker so the simulated price clock (start_time) stays consistent
+CMD ["sh", "-c", "gunicorn -w 1 -b 0.0.0.0:${PORT} app:app"]
