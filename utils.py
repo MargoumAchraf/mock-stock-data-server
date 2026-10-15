@@ -3,8 +3,11 @@ from datetime import datetime
 
 import pandas as pd
 
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+DEFAULT_DATA_DIR = os.path.join(BASE_DIR, "sample-stocks")
 
-def load_data(directory_path="./sample-stocks/"):
+
+def load_data(directory_path=DEFAULT_DATA_DIR):
     historical_data = {}
 
     file_list = [
